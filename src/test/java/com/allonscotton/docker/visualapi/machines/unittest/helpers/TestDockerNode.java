@@ -11,56 +11,77 @@ import com.spotify.docker.client.messages.swarm.Version;
 
 public class TestDockerNode extends Node {
 	
+	private String id;
+	private Version version;
+	private Date created;
+	private Date updated;
+	private NodeSpec spec;
+	private NodeDescription description;
+	private NodeStatus status;
+	private ManagerStatus managerStatus;
+	
 	public TestDockerNode()
 	{
+		this(null,null,null,null,null,null,null,null);
+	}
+	
+	public TestDockerNode(String id,
+			Version version,
+			Date created,
+			Date updated,
+			NodeSpec spec,
+			NodeDescription description,
+			NodeStatus status,
+			ManagerStatus managerStatus)
+	{
+		this.id = id;
+		this.version = version;
+		this.created = created;
+		this.updated = updated;
+		this.spec = spec;
+		this.description = description;
+		this.status = status;
+		this.managerStatus = managerStatus;
 	}
 
 	@Override
 	public String id() {
-		// TODO Auto-generated method stub
-		return null;
+		return id;
 	}
 
 	@Override
 	public Version version() {
-		// TODO Auto-generated method stub
-		return null;
+		return version;
 	}
 
 	@Override
 	public Date createdAt() {
-		// TODO Auto-generated method stub
-		return null;
+		return created;
 	}
 
 	@Override
 	public Date updatedAt() {
-		// TODO Auto-generated method stub
-		return null;
+		return updated;
 	}
 
 	@Override
 	public NodeSpec spec() {
-		// TODO Auto-generated method stub
-		return null;
+		return spec;
 	}
 
 	@Override
 	public NodeDescription description() {
-		// TODO Auto-generated method stub
-		return null;
+		return description;
 	}
 
 	@Override
 	public NodeStatus status() {
-		// TODO Auto-generated method stub
-		return null;
+		return status;
 	}
 
 	@Override
 	public ManagerStatus managerStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return managerStatus;
 	}
 
 }

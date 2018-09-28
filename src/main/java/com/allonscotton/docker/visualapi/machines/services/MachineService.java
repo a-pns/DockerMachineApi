@@ -29,7 +29,7 @@ public class MachineService implements MachineServiceI {
 			List<Machine> machines = new ArrayList<Machine>();
 			List<Node> nodes = dockerClient.listNodes();
 			machines = nodes.stream().map(
-					node -> new Machine()
+					node -> new Machine(node.id())
 					).collect(Collectors.toList());
 			return machines;
 		} catch (DockerException | InterruptedException e) {

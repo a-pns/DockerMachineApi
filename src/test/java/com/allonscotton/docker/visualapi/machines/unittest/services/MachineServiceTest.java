@@ -17,7 +17,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
 import com.allonscotton.docker.visualapi.machines.resources.Machine;
 import com.allonscotton.docker.visualapi.machines.services.MachineService;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerManagerStatus;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeStatus;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerVersion;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
@@ -71,6 +74,32 @@ public class MachineServiceTest {
 		when(dockerClient.listNodes()).thenThrow(InterruptedException.class);
 		
 		machineService.listMachines();
+	}
+	
+	@Test
+	public void TestThatNodeIdIsMappedToMachineObjectsIDField() throws DockerException, InterruptedException
+	{
+		MachineService machineService = new MachineService(dockerClient);
+		
+		when(dockerClient.listNodes()).thenReturn(
+				Arrays.asList(
+						new TestDockerNode(
+								"123456789", 
+								new TestDockerVersion((long) 1), 
+								new Date(), 
+								new Date(), 
+								null,
+								null, new TestDockerNodeStatus("active", "192.0.0.1"), 
+								new TestDockerManagerStatus(true, "up", "192.0.0.1")
+								)
+						)
+				);
+		
+		List<Machine> testResult = machineService.listMachines();
+		Assert.assertNotNull(testResult);
+		Assert.assertEquals(1, testResult.size());
+		Assert.assertEquals("123456789", testResult.get(0).getId());
+		verify(dockerClient).listNodes();
 	}
 
 }

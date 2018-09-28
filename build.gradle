@@ -28,6 +28,7 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
+	
 	compile group: 'org.json', name: 'json', version: '20180813'
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
 	compile group: 'com.spotify', name: 'docker-client', version: '8.13.1'
