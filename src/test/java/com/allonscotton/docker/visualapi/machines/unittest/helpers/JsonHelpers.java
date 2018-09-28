@@ -1,4 +1,4 @@
-package com.allonscotton.docker.visualapi.machines.machines.unittest.helpers;
+package com.allonscotton.docker.visualapi.machines.unittest.helpers;
 
 import org.json.JSONObject;
 

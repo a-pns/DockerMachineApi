@@ -1,4 +1,4 @@
-package com.allonscotton.docker.visualapi.machines.unitest.services;
+package com.allonscotton.docker.visualapi.machines.unittest.services;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
-import com.allonscotton.docker.visualapi.machines.machines.unittest.helpers.TestDockerNode;
 import com.allonscotton.docker.visualapi.machines.resources.Machine;
 import com.allonscotton.docker.visualapi.machines.services.MachineService;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
