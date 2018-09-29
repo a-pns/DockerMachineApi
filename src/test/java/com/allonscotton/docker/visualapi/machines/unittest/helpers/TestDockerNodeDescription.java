@@ -7,14 +7,16 @@ import com.spotify.docker.client.messages.swarm.Resources;
 
 public class TestDockerNodeDescription extends NodeDescription {
 	
-	public TestDockerNodeDescription()
+	private String hostname;
+	
+	public TestDockerNodeDescription(String hostname)
 	{
-		
+		this.hostname = hostname;
 	}
 
 	@Override
 	public String hostname() {
-		return null;
+		return hostname;
 	}
 
 	@Override

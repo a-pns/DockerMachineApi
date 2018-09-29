@@ -4,8 +4,10 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.junit.Test;
@@ -21,10 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.allonscotton.docker.visualapi.machines.DockerVisualApiApplication;
 import com.allonscotton.docker.visualapi.machines.StringConstants;
-import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerManagerStatus;
-import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
-import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeStatus;
-import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerVersion;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDataHelper;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
@@ -49,33 +48,38 @@ public class MachineControllerIT {
 
 	@Test
 	public void testThatMachinesEndpointReturnsCorrectListInfo() throws Exception {
+		
+
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date testDate1 = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date testDate2 = cal.getTime();
+		
 		given(dockerClient.listNodes()).willReturn(
 				Arrays.asList(
-						new TestDockerNode(
-								"123456789", 
-								new TestDockerVersion((long) 1), 
-								new Date(), 
-								new Date(), 
-								null,
-								null, new TestDockerNodeStatus("active", "192.0.0.1"), 
-								new TestDockerManagerStatus(true, "up", "192.0.0.1")), 
-						new TestDockerNode(
-								"zxcvbnm", 
-								new TestDockerVersion((long) 1), 
-								new Date(), new Date(), 
-								null,
-								null, 
-								new TestDockerNodeStatus("down", "178.0.0.1"), 
-								new TestDockerManagerStatus(false, "up", "178.0.0.1")
-								)
+						TestDataHelper.getTestDockerNode("123456789", (long) 1, "active", "active", "192.0.0.1", "server1", true, testDate1, testDate2),
+						TestDataHelper.getTestDockerNode("zxcvbnm", (long) 1, "inactive", "inactive", "178.1.1.1", "server2", false, testDate2, testDate1)
 						)
 				);
-		System.out.println(this.mockMvc.perform(get("/machine")).andExpect(status().isOk()).andReturn()
-				.getResponse().getContentAsString());
+		this.mockMvc.perform(get("/machine")).andExpect(status().isOk()).andReturn()
+				.getResponse().getContentAsString();
 		
 		this.mockMvc.perform(get("/machine")).andExpect(status().isOk())
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].id").value("123456789"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].status").value("active"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].version").value("1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].ip").value("192.0.0.1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].hostname").value("server1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].created").value(testDate1))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].updated").value(testDate2))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].id").value("zxcvbnm"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].status").value("inactive"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].version").value("1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].ip").value("178.1.1.1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].hostname").value("server2"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].created").value(testDate2))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].updated").value(testDate1))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._links.self.href").value("http://localhost/machine/"));
 	}
 

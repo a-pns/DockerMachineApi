@@ -2,6 +2,7 @@ package com.allonscotton.docker.visualapi.machines.unittest.controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,8 +58,9 @@ public class MachineControllerTest {
 	@Test
 	public void testThatGetEndPointReturnsOneMachine() {
 		MachineController machineController = new MachineController(machineService);
+		Machine machine = new Machine("987456321", new Date(), new Date(), (long) 1, null, null, null);
 		
-		when(machineService.listMachines()).thenReturn(Arrays.asList(new Machine("987456321")));
+		when(machineService.listMachines()).thenReturn(Arrays.asList(machine));
 		
 		Resources<Resource<Machine>> machines = machineController.listAllMachines();
 		Assert.assertNotNull(machines);

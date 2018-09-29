@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import com.allonscotton.docker.visualapi.machines.resources.Machine;
 import com.allonscotton.docker.visualapi.machines.services.MachineService;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerManagerStatus;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeDescription;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeStatus;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerVersion;
 import com.spotify.docker.client.DockerClient;
@@ -100,6 +102,152 @@ public class MachineServiceTest {
 		Assert.assertEquals(1, testResult.size());
 		Assert.assertEquals("123456789", testResult.get(0).getId());
 		verify(dockerClient).listNodes();
+	}
+	
+	@Test
+	public void testThatMapNodeToMachineReturnsMachine()
+	{
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNode node = new TestDockerNode();
+		
+		Machine machine = machineService.mapMachine(node);
+		
+		Assert.assertNotNull(machine);
+	}
+	
+	@Test
+	public void testThatMapNodeToMachineSetsFieldsCorrectly()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
+		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
+		TestDockerNodeStatus nodeStatus = new TestDockerNodeStatus("UP", "127.7.7.7");
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNode node = new TestDockerNode(
+				"TheId", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		Machine machine = machineService.mapMachine(node);
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals(created, machine.getCreated());
+		Assert.assertEquals(updated, machine.getUpdated());
+		Assert.assertEquals(dockerVersion.index(), machine.getVersion());
+		Assert.assertEquals(nodeDescription.hostname(), machine.getHostname());
+		Assert.assertEquals(nodeStatus.addr(), machine.getIP());
+		Assert.assertEquals(nodeStatus.state(), machine.getStatus());
+	}
+	
+	@Test
+	public void testThatMapNodeToMachineHandlesNullVersion()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = null;
+		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
+		TestDockerNodeStatus nodeStatus = new TestDockerNodeStatus("UP", "127.7.7.7");
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNode node = new TestDockerNode(
+				"TheId", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		Machine machine = machineService.mapMachine(node);
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( (long) -1, (long) machine.getVersion());
+	}
+	
+	@Test
+	public void testThatMapNodeToMachineHandlesNullDescription()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
+		TestDockerNodeDescription nodeDescription = null;
+		TestDockerNodeStatus nodeStatus = new TestDockerNodeStatus("UP", "127.7.7.7");
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNode node = new TestDockerNode(
+				"TheId", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		Machine machine = machineService.mapMachine(node);
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( "Unknown" , machine.getHostname());
+	}
+	
+	@Test
+	public void testThatMapNodeToMachineHandlesNullStatus()
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
+		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
+		TestDockerNodeStatus nodeStatus = null;
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNode node = new TestDockerNode(
+				"TheId", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		Machine machine = machineService.mapMachine(node);
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( "Unknown" , machine.getStatus());
+		Assert.assertEquals( "Unknown" , machine.getIP());
 	}
 
 }
