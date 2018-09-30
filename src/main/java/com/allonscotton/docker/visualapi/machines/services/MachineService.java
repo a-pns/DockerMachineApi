@@ -9,11 +9,16 @@ import org.springframework.stereotype.Service;
 
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
 import com.allonscotton.docker.visualapi.machines.resources.*;
-import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.swarm.Node;
 
+/**
+ * Service class that handles the backend service level operations
+ * needed when retrieving the docker nodes from the swarm
+ * @author allonscotton
+ *
+ */
 @Service
 public class MachineService implements MachineServiceI {
 	

@@ -10,6 +10,11 @@ import com.allonscotton.docker.visualapi.machines.StringConstants;
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
 import com.allonscotton.docker.visualapi.machines.responses.ErrorResponse;
 
+/**
+ * Class that handles all the exceptions that come into the services and sends the appropriate response
+ * @author allonscotton
+ *
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	

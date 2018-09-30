@@ -1,5 +1,10 @@
 package com.allonscotton.docker.visualapi.machines.responses;
 
+/**
+ * Error response object that is used to send information back to the client when an error has occured
+ * @author allonscotton
+ *
+ */
 public class ErrorResponse {
 	
 	private int status;

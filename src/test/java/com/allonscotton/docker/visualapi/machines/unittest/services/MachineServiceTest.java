@@ -120,9 +120,10 @@ public class MachineServiceTest {
 	public void testThatMapNodeToMachineSetsFieldsCorrectly()
 	{
 		Calendar cal = Calendar.getInstance();
-		cal.set(2018, 9, 29);
+		cal.set(2018, 8, 29, 0, 0, 0);
+		cal.set(Calendar.MILLISECOND, 0);
 		Date created = cal.getTime();
-		cal.set(2018, 10, 1, 23, 59);
+		cal.set(2018, 9, 1, 23, 59, 0);
 		Date updated = cal.getTime();
 		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
 		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
@@ -145,8 +146,8 @@ public class MachineServiceTest {
 		Machine machine = machineService.mapMachine(node);
 		
 		Assert.assertNotNull(machine);
-		Assert.assertEquals(created, machine.getCreated());
-		Assert.assertEquals(updated, machine.getUpdated());
+		Assert.assertEquals("29-09-2018 00:00:00.000", machine.getCreated());
+		Assert.assertEquals("01-10-2018 23:59:00.000", machine.getUpdated());
 		Assert.assertEquals(dockerVersion.index(), machine.getVersion());
 		Assert.assertEquals(nodeDescription.hostname(), machine.getHostname());
 		Assert.assertEquals(nodeStatus.addr(), machine.getIP());

@@ -14,6 +14,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 import com.allonscotton.docker.visualapi.machines.resources.Machine;
 import com.allonscotton.docker.visualapi.machines.services.MachineServiceI;
 
+/**
+ * Handles the REST request that come into the service and sends the appropriate responses
+ * @author allonscotton
+ *
+ */
 @RestController
 @RequestMapping("machine")
 public class MachineController {

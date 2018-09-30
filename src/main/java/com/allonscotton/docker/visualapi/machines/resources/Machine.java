@@ -2,9 +2,14 @@ package com.allonscotton.docker.visualapi.machines.resources;
 
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
+/**
+ * Class that models the Docker node on a swarm
+ * Has fields for all the pertinent information returned by the API
+ * @author allonscotton
+ *
+ */
 public class Machine {
 	private String id;
 	private Date created;
@@ -13,6 +18,7 @@ public class Machine {
 	private String hostname;
 	private String ip;
 	private String status;
+	private SimpleDateFormat format;
 	
 	public Machine(String id, Date created, Date updated, Long version, String hostname, String ip, String status)
 	{
@@ -23,18 +29,20 @@ public class Machine {
 		this.hostname = hostname;
 		this.ip = ip;
 		this.status = status;
+		format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
+		
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public Date getCreated() {
-		return created;
+	public String getCreated() {
+		return format.format(created);
 	}
 
-	public Date getUpdated() {
-		return updated;
+	public String getUpdated() {
+		return format.format(updated);
 	}
 
 	public Long getVersion() {

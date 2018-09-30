@@ -51,9 +51,10 @@ public class MachineControllerIT {
 		
 
 		Calendar cal = Calendar.getInstance();
-		cal.set(2018, 9, 29);
+		cal.set(2018, 9, 29, 0, 0, 0);
+		cal.set(Calendar.MILLISECOND, 0);
 		Date testDate1 = cal.getTime();
-		cal.set(2018, 10, 1, 23, 59);
+		cal.set(2018, 10, 1, 23, 59, 0);
 		Date testDate2 = cal.getTime();
 		
 		given(dockerClient.listNodes()).willReturn(
@@ -71,15 +72,15 @@ public class MachineControllerIT {
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].version").value("1"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].ip").value("192.0.0.1"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].hostname").value("server1"))
-		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].created").value(testDate1))
-		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].updated").value(testDate2))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].created").value("29-10-2018 00:00:00.000"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].updated").value("01-11-2018 23:59:00.000"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].id").value("zxcvbnm"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].status").value("inactive"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].version").value("1"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].ip").value("178.1.1.1"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].hostname").value("server2"))
-		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].created").value(testDate2))
-		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].updated").value(testDate1))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].updated").value("29-10-2018 00:00:00.000"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[1].created").value("01-11-2018 23:59:00.000"))
 		.andExpect(MockMvcResultMatchers.jsonPath("$._links.self.href").value("http://localhost/machine/"));
 	}
 
