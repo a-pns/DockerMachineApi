@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import com.allonscotton.docker.visualapi.machines.controllers.MachineController;
@@ -65,5 +66,22 @@ public class MachineControllerTest {
 		Resources<Resource<Machine>> machines = machineController.listAllMachines();
 		Assert.assertNotNull(machines);
 		Assert.assertEquals(1,machines.getContent().size());
+	}
+	
+	@Test
+	public void testThatGetMachineEndPointReturnsMachineResource() {
+		MachineController machineController = new MachineController(machineService);
+		
+		when(machineService.getMachine(anyString())).thenReturn(new Machine("abc123", null, null, null, null, null, null));
+		
+		Resource<Machine> machine = machineController.getMachine("abc123");
+		Assert.assertNotNull(machine);
+		Assert.assertNotNull(machine.getContent());
+	}
+	
+	@Test
+	public void testThatGetMachineEndPointSetAppropriateLinks()
+	{
+		fail();
 	}
 }

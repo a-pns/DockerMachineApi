@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
@@ -51,6 +52,14 @@ public class MachineController {
 				);
 		
 		return result;
+	}
+
+	@GetMapping(path = "/{id}")
+	public Resource<Machine> getMachine(@PathVariable(name = "id") String id) {
+		Machine machine = machineService.getMachine(id);
+		
+		Resource<Machine> resource = new Resource<Machine>(machine);
+		return resource;
 	}
 	
 }

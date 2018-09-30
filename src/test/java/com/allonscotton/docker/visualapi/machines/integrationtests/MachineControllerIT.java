@@ -3,8 +3,8 @@ package com.allonscotton.docker.visualapi.machines.integrationtests;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Matchers.*;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,6 +26,7 @@ import com.allonscotton.docker.visualapi.machines.StringConstants;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDataHelper;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.exceptions.NodeNotFoundException;
 import com.spotify.docker.client.messages.swarm.Node;
 
 @AutoConfigureMockMvc
@@ -106,5 +107,32 @@ public class MachineControllerIT {
 		this.mockMvc.perform(get("/machine")).andExpect(status().isInternalServerError())
 		.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(StringConstants.GENERIC_INTERNAL_SERVER_ERROR))
 		.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(500));
+	}
+	
+	@Test
+	public void testThat404IsReturnedWhenGettingAMachineThatDoesNotExist() throws Exception
+	{
+		given(dockerClient.inspectNode(anyString())).willThrow(NodeNotFoundException.class);
+		this.mockMvc.perform(get("/machine/123abc")).andExpect(status().isNotFound())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(StringConstants.MACHINE_NOT_FOUND))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(404));
+	}
+	
+	@Test
+	public void testThat500IsReturnedWhenGettingAMachineThatDoesExistButErrorWasThrown() throws Exception
+	{
+		given(dockerClient.inspectNode(anyString())).willThrow(RuntimeException.class);
+		this.mockMvc.perform(get("/machine/123abc")).andExpect(status().isInternalServerError())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(StringConstants.UNABLE_TO_RETRIEVE_NODE_INFO))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(500));
+	}
+	
+	@Test
+	public void testThat200IsReturnedWhenGettingAMachineThatDoesExist() throws Exception
+	{
+		given(dockerClient.inspectNode(anyString())).willReturn(
+				TestDataHelper.getTestDockerNodeInfo("123456789", (long) 1, "active", "active", "192.0.0.1", "server1", true, new Date(), new Date())
+				);
+		this.mockMvc.perform(get("/machine/123abc")).andExpect(status().isOk());
 	}
 };

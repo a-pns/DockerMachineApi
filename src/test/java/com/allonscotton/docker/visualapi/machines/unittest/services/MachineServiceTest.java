@@ -2,6 +2,7 @@ package com.allonscotton.docker.visualapi.machines.unittest.services;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,16 +16,21 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.allonscotton.docker.visualapi.machines.exceptions.MachineNotFoundException;
+import com.allonscotton.docker.visualapi.machines.exceptions.UnableToRetrieveNodeException;
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
 import com.allonscotton.docker.visualapi.machines.resources.Machine;
 import com.allonscotton.docker.visualapi.machines.services.MachineService;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDataHelper;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerManagerStatus;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNode;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeDescription;
+import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeInfo;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerNodeStatus;
 import com.allonscotton.docker.visualapi.machines.unittest.helpers.TestDockerVersion;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.exceptions.NodeNotFoundException;
 import com.spotify.docker.client.messages.swarm.Node;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -250,5 +256,30 @@ public class MachineServiceTest {
 		Assert.assertEquals( "Unknown" , machine.getStatus());
 		Assert.assertEquals( "Unknown" , machine.getIP());
 	}
-
+	
+	@Test
+	public void testGetMachineReturnMachineObject() throws DockerException, InterruptedException
+	{
+		TestDockerNodeInfo nodeInfo = TestDataHelper.getTestDockerNodeInfo(null, 0, null, null, null, null, false, null, null);
+		when(dockerClient.inspectNode(anyString())).thenReturn(nodeInfo);
+		MachineService machineService = new MachineService(dockerClient);
+		Machine machine = machineService.getMachine("123abc");
+		Assert.assertNotNull(machine);
+	}
+	
+	@Test(expected = MachineNotFoundException.class)
+	public void testThatMachineNotFoundIsThrownWhenDockerNodeNotFoundIsThrown() throws DockerException, InterruptedException
+	{
+		when(dockerClient.inspectNode(anyString())).thenThrow(NodeNotFoundException.class);
+		MachineService machineService = new MachineService(dockerClient);
+		machineService.getMachine("123abc");
+	}
+	
+	@Test(expected = UnableToRetrieveNodeException.class)
+	public void testThatUnableToFindIsThrownWhenExceptionIsThrown() throws DockerException, InterruptedException
+	{
+		when(dockerClient.inspectNode(anyString())).thenThrow(Exception.class);
+		MachineService machineService = new MachineService(dockerClient);
+		machineService.getMachine("123abc");
+	}
 }

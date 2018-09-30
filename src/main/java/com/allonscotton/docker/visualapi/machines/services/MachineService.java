@@ -7,11 +7,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.allonscotton.docker.visualapi.machines.exceptions.MachineNotFoundException;
 import com.allonscotton.docker.visualapi.machines.exceptions.UnableToFindNodesException;
+import com.allonscotton.docker.visualapi.machines.exceptions.UnableToRetrieveNodeException;
 import com.allonscotton.docker.visualapi.machines.resources.*;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
+import com.spotify.docker.client.exceptions.NodeNotFoundException;
 import com.spotify.docker.client.messages.swarm.Node;
+import com.spotify.docker.client.messages.swarm.NodeInfo;
 
 /**
  * Service class that handles the backend service level operations
@@ -77,5 +81,24 @@ public class MachineService implements MachineServiceI {
 				status);
 		
 		return theMachine;
+	}
+
+	@Override
+	public Machine getMachine(String nodeId) {
+		try
+		{
+			NodeInfo info = dockerClient.inspectNode(nodeId);
+			return null;
+		}
+		catch (NodeNotFoundException e)
+		{
+			e.printStackTrace();
+			throw new MachineNotFoundException();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new UnableToRetrieveNodeException();
+		}
 	}
 }

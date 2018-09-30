@@ -11,4 +11,5 @@ import com.allonscotton.docker.visualapi.machines.resources.*;
  */
 public interface MachineServiceI {
 	public List<Machine> listMachines();
+	public Machine getMachine(String id);
 }
