@@ -64,8 +64,6 @@ public class MachineControllerIT {
 						TestDataHelper.getTestDockerNode("zxcvbnm", (long) 1, "inactive", "inactive", "178.1.1.1", "server2", false, testDate2, testDate1)
 						)
 				);
-		this.mockMvc.perform(get("/machine")).andExpect(status().isOk()).andReturn()
-				.getResponse().getContentAsString();
 		
 		this.mockMvc.perform(get("/machine")).andExpect(status().isOk())
 		.andExpect(MockMvcResultMatchers.jsonPath("$._embedded.machines[0].id").value("123456789"))
@@ -134,5 +132,34 @@ public class MachineControllerIT {
 				TestDataHelper.getTestDockerNodeInfo("123456789", (long) 1, "active", "active", "192.0.0.1", "server1", true, new Date(), new Date())
 				);
 		this.mockMvc.perform(get("/machine/123abc")).andExpect(status().isOk());
+	}
+	
+	@Test
+	public void testThatGetMachineEndpointReturnsCorrectListInfo() throws Exception {
+		
+
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29, 0, 0, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		Date testDate1 = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59, 0);
+		Date testDate2 = cal.getTime();
+		
+		given(dockerClient.inspectNode(anyString())).willReturn(
+						TestDataHelper.getTestDockerNodeInfo("123456789", (long) 1, "active", "active", "192.0.0.1", "server1", true, testDate1, testDate2)
+						);
+		
+		this.mockMvc.perform(get("/machine/123456789")).andExpect(status().isOk())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.id").value("123456789"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.status").value("active"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.version").value("1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.ip").value("192.0.0.1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.hostname").value("server1"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.created").value("29-10-2018 00:00:00.000"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$.updated").value("01-11-2018 23:59:00.000"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._links.self.href").value("http://localhost/machine/123456789"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._links[\"machine.container\"].href").value("http://localhost/machine/123456789/container"))
+		.andExpect(MockMvcResultMatchers.jsonPath("$._links[\"machine.list\"].href").value("http://localhost/machine/"));
+
 	}
 };

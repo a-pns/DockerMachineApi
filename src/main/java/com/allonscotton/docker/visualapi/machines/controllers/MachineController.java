@@ -3,7 +3,10 @@ package com.allonscotton.docker.visualapi.machines.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,10 +58,13 @@ public class MachineController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public Resource<Machine> getMachine(@PathVariable(name = "id") String id) {
+	public Resource<Machine> getMachine(@PathVariable(name = "id") String id, HttpServletRequest request) {
 		Machine machine = machineService.getMachine(id);
-		
-		Resource<Machine> resource = new Resource<Machine>(machine);
+		Link containerLink = new Link(request.getRequestURL().toString() + "/container","machine.container");
+		Resource<Machine> resource = new Resource<Machine>(machine, 
+				linkTo(methodOn(MachineController.class).getMachine(id, request)).withSelfRel(),
+				linkTo(methodOn(MachineController.class).listAllMachines()).withRel("machine.list"),
+				containerLink);
 		return resource;
 	}
 	

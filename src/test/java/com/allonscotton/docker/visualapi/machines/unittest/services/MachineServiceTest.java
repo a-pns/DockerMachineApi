@@ -282,4 +282,108 @@ public class MachineServiceTest {
 		MachineService machineService = new MachineService(dockerClient);
 		machineService.getMachine("123abc");
 	}
+	
+
+	@Test
+	public void testThatGetMachineHandlesNullVersion() throws DockerException, InterruptedException
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = null;
+		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
+		TestDockerNodeStatus nodeStatus = new TestDockerNodeStatus("UP", "127.7.7.7");
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNodeInfo node = new TestDockerNodeInfo(
+				"abc123", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		when(dockerClient.inspectNode(anyString())).thenReturn(node);
+		
+		Machine machine = machineService.getMachine("abc123");
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( (long) -1, (long) machine.getVersion());
+	}
+	
+	@Test
+	public void testThatGetMachineHandlesNullDescription() throws DockerException, InterruptedException
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
+		TestDockerNodeDescription nodeDescription = null;
+		TestDockerNodeStatus nodeStatus = new TestDockerNodeStatus("UP", "127.7.7.7");
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNodeInfo node = new TestDockerNodeInfo(
+				"abc123", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		when(dockerClient.inspectNode(anyString())).thenReturn(node);
+		
+		Machine machine = machineService.getMachine("abc123");
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( "Unknown" , machine.getHostname());
+	}
+	
+	@Test
+	public void testThatGetMachineHandlesNullStatus() throws DockerException, InterruptedException
+	{
+		Calendar cal = Calendar.getInstance();
+		cal.set(2018, 9, 29);
+		Date created = cal.getTime();
+		cal.set(2018, 10, 1, 23, 59);
+		Date updated = cal.getTime();
+		TestDockerVersion dockerVersion = new TestDockerVersion((long) 1); 
+		TestDockerNodeDescription nodeDescription = new TestDockerNodeDescription("localhost");
+		TestDockerNodeStatus nodeStatus = null;
+		TestDockerManagerStatus managerStatus = new TestDockerManagerStatus(true, "UP", "127.7.7.7");
+		
+		MachineService machineService = new MachineService(dockerClient);
+		
+		TestDockerNodeInfo node = new TestDockerNodeInfo(
+				"abc123", 
+				dockerVersion,
+				created,
+				updated,
+				null,
+				nodeDescription,
+				nodeStatus,
+				managerStatus
+				);
+		
+		when(dockerClient.inspectNode(anyString())).thenReturn(node);
+		
+		Machine machine = machineService.getMachine("abc123");
+		
+		Assert.assertNotNull(machine);
+		Assert.assertEquals( "Unknown" , machine.getStatus());
+		Assert.assertEquals( "Unknown" , machine.getIP());
+	}
 }

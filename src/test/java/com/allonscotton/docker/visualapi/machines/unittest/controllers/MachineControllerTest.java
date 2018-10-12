@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +15,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 import com.allonscotton.docker.visualapi.machines.controllers.MachineController;
@@ -71,10 +72,13 @@ public class MachineControllerTest {
 	@Test
 	public void testThatGetMachineEndPointReturnsMachineResource() {
 		MachineController machineController = new MachineController(machineService);
+		Machine mockMachine = new Machine("abc123", null, null, (long) 123, null, null, null);
+		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+		when(machineService.getMachine(anyString())).thenReturn(mockMachine);
+		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost/machine/abc123"));
+
 		
-		when(machineService.getMachine(anyString())).thenReturn(new Machine("abc123", null, null, null, null, null, null));
-		
-		Resource<Machine> machine = machineController.getMachine("abc123");
+		Resource<Machine> machine = machineController.getMachine("abc123", mockRequest);
 		Assert.assertNotNull(machine);
 		Assert.assertNotNull(machine.getContent());
 	}
@@ -82,6 +86,20 @@ public class MachineControllerTest {
 	@Test
 	public void testThatGetMachineEndPointSetAppropriateLinks()
 	{
-		fail();
+		MachineController machineController = new MachineController(machineService);
+		Machine mockMachine = new Machine("abc123", null, null, (long) 123, null, null, null);
+		HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+
+		when(machineService.getMachine(anyString())).thenReturn(mockMachine);
+		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("http://localhost/machine/abc123"));
+		
+		Resource<Machine> machine = machineController.getMachine("abc123", mockRequest);
+		Assert.assertNotNull(machine);
+		Assert.assertEquals("/machine/abc123", machine.getLink("self").getHref());
+		Assert.assertEquals("self", machine.getLink("self").getRel());
+		Assert.assertEquals("/machine/", machine.getLink("machine.list").getHref());
+		Assert.assertEquals("machine.list", machine.getLink("machine.list").getRel());
+		Assert.assertEquals("http://localhost/machine/abc123/container", machine.getLink("machine.container").getHref());
+		Assert.assertEquals("machine.container", machine.getLink("machine.container").getRel());
 	}
 }

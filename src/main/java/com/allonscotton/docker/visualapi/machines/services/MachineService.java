@@ -88,7 +88,30 @@ public class MachineService implements MachineServiceI {
 		try
 		{
 			NodeInfo info = dockerClient.inspectNode(nodeId);
-			return null;
+			long version = (long) -1;
+			String hostname = "Unknown";
+			String ip = "Unknown";
+			String status = "Unknown";
+
+			if (info.version() != null)
+				version = info.version().index();
+			if (info.description() != null)
+				hostname = info.description().hostname();
+			if (info.status() != null)
+			{
+				ip = info.status().addr();
+				status = info.status().state();
+			}
+			
+			Machine machine = new Machine(
+					info.id(), 
+					info.createdAt(), 
+					info.updatedAt(), 
+					version, 
+					hostname,
+					ip,
+					status);
+			return machine;
 		}
 		catch (NodeNotFoundException e)
 		{
